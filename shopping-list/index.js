@@ -1,7 +1,18 @@
 'use strict';
 
+const STORE = [
+  {name: 'apple', checked: false},
+  {name: 'oranges', checked: false},
+  {name: 'milk', checked: true},
+  {name: 'bread', checked: false}
+];
+
+
 function renderShoppinglist() {
   //render the shopping list in the DOM
+  const shoppingListItemsString = '<li>apples</li>';
+
+  $('.js-shopping-list').html(shoppingListItemsString);
   console.log('`renderShoppinglist` ran');
 }
 
