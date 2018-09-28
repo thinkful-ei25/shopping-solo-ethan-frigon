@@ -58,6 +58,10 @@ function toggleCheckedForListItem(itemIndex) {
   STORE[itemIndex].checked = !STORE[itemIndex].checked;
 }
 
+function deleteListItem(itemIndex) {
+  STORE.splice(itemIndex, 1);
+}
+
 function handleNewItemSubmit() {
   //responsible for when users add a new shopping item list
   $('#js-shopping-list-form').submit(function(event){
@@ -83,7 +87,12 @@ function handleItemCheckClicked() {
 
 function handleDeleteItemClicked() {
   //responsible for when users want to delete the selected item
-  console.log('`handleDeleteItemClicked` ran');
+  $('.js-shopping-list').on('click', '.js-item-delete', event => {
+    console.log('`handleDeleteItemClicked` ran');
+    const itemIndex = getItemIndexFromElement(event.currentTarget);
+    deleteListItem(itemIndex);
+    renderShoppinglist();
+  });
 }
 
 function handleShoppingList() {
