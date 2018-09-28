@@ -1,13 +1,17 @@
 'use strict';
 
-const STORE = [
-  {name: 'apple', checked: false},
-  {name: 'oranges', checked: false},
-  {name: 'milk', checked: true},
-  {name: 'bread', checked: false}
-];
+const STORE = {
+  items: [
+    {name: 'apple', checked: false},
+    {name: 'oranges', checked: false},
+    {name: 'milk', checked: true},
+    {name: 'bread', checked: false}
+  ],
+  hideCompleted: false,
+  searchTerm: null,
+};
 
-function generateItemElement(item, itemIndex, template ) {
+function generateItemElement(item, itemIndex, template) {
   return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
       <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked" : ''}">${item.name}</span>
@@ -30,19 +34,22 @@ function generateShoppingItemsString(shoppingList) {
   return items.join('');
 }
 
-
 function renderShoppinglist() {
   //render the shopping list in the DOM
-  
-  const shoppingListItemsString = generateShoppingItemsString(STORE);
+  let filteredItems = Array.from(STORE.items);
 
+  if (STORE.hideCompleted === true) {
+    filteredItems = filteredItems.filter(item => !item.checked);
+  }
+  
+  const shoppingListItemsString = generateShoppingItemsString(filteredItems);
   $('.js-shopping-list').html(shoppingListItemsString);
   console.log('`renderShoppinglist` ran');
 }
 
 function addItemtoShoppingList(itemName){
   console.log(`Adding "${itemName}" to shopping list`);
-  STORE.push({name: itemName, checked: false});
+  STORE.items.push({name: itemName, checked: false});
 }
 
 function getItemIndexFromElement(item) {
@@ -55,11 +62,16 @@ function getItemIndexFromElement(item) {
 
 function toggleCheckedForListItem(itemIndex) {
   console.log('Toggling checked property for item at index ' + itemIndex);
-  STORE[itemIndex].checked = !STORE[itemIndex].checked;
+  STORE.items[itemIndex].checked = !STORE.items[itemIndex].checked;
+}
+
+function toggleHideItems(itemIndex) {
+  console.log('Toggling checked property for item at index ' + itemIndex);
+  STORE.hideCompleted = !STORE.hideCompleted;
 }
 
 function deleteListItem(itemIndex) {
-  STORE.splice(itemIndex, 1);
+  STORE.items.splice(itemIndex, 1);
 }
 
 function handleNewItemSubmit() {
@@ -73,7 +85,6 @@ function handleNewItemSubmit() {
     renderShoppinglist();
   });
 }
-
 
 function handleItemCheckClicked() {
   //responsible for when users want to click the "check" button on an item
@@ -95,10 +106,17 @@ function handleDeleteItemClicked() {
   });
 }
 
+function handleToggleHideButton() {
+  $('#toggle-completed-filter').click(function(event){
+    toggleHideItems(STORE.items);
+    renderShoppinglist();
+  })
+}
 function handleShoppingList() {
   renderShoppinglist();
   handleNewItemSubmit();
   handleItemCheckClicked();
+  handleToggleHideButton();
   handleDeleteItemClicked();
 
 }
