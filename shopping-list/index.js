@@ -14,13 +14,17 @@ const STORE = {
 function generateItemElement(item, itemIndex, template) {
   return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
-      <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked" : ''}">${item.name}</span>
+      <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
       <div class="shopping-item-controls">
+        <form id="js-shopping-list-form">
+            <label for="shopping-item-edit">edit</label>
+            <input type="text" name="shopping-item-edit" class="js-shopping-item-edit">
+            <button type="submit">edit</button>
         <button class="shopping-item-toggle js-item-toggle">
-            <span class="button-label">check</span>
+          <span class="button-label">check</span>
         </button>
         <button class="shopping-item-delete js-item-delete">
-            <span class="button-label">delete</span>
+          <span class="button-label">delete</span>
         </button>
       </div>
     </li>`;
@@ -42,6 +46,10 @@ function renderShoppinglist() {
     filteredItems = filteredItems.filter(item => !item.checked);
   }
   
+  if(STORE.searchTerm !== null) {
+    filteredItems = filteredItems.filter(item => item.name.includes(STORE.searchTerm));
+  }
+
   const shoppingListItemsString = generateShoppingItemsString(filteredItems);
   $('.js-shopping-list').html(shoppingListItemsString);
   console.log('`renderShoppinglist` ran');
@@ -51,6 +59,10 @@ function addItemtoShoppingList(itemName){
   console.log(`Adding "${itemName}" to shopping list`);
   STORE.items.push({name: itemName, checked: false});
 }
+
+function searchItemFromShoppingList(itemName) {
+  STORE.searchTerm = itemName;
+} 
 
 function getItemIndexFromElement(item) {
   const itemIndexString = $(item)
@@ -110,15 +122,39 @@ function handleToggleHideButton() {
   $('#toggle-completed-filter').click(function(event){
     toggleHideItems(STORE.items);
     renderShoppinglist();
-  })
+  });
 }
+
+function handleSearchButton() {
+  $('#js-shopping-list-search').submit(function(event){
+    event.preventDefault();
+    const newSearchTerm = $('.js-shopping-list-search').val();
+    console.log(newSearchTerm);
+    searchItemFromShoppingList(itemName);
+  });
+}
+
+function handleEditFunction() {
+  $('#js-shopping-item-edit').submit(function(event){
+    event.preventDefault();
+    const newItemName = $('.js-shopping-item-edit').val();
+    console.log('handleEditFunction ran');
+    addItemtoShoppingList(newItemName);
+    renderShoppinglist();
+  });
+  //Allow user to edit the name of an existing item on the shopping list
+  //Add edit button to li item
+  //Edit generation of item element so it is now a form
+}
+
 function handleShoppingList() {
   renderShoppinglist();
   handleNewItemSubmit();
   handleItemCheckClicked();
   handleToggleHideButton();
   handleDeleteItemClicked();
-
+  handleSearchButton();
+  handleEditFunction();
 }
 
-$(handleShoppingList);
+$(handleShoppingList)
